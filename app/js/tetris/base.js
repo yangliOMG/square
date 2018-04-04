@@ -69,6 +69,7 @@ class Base{
 		}
 	}
 	setData(square,gamedata){
+		if(square.length==0) return true;
 		for(let i=0;i<square.data.length;i++){ 
 			for(let j=0;j<square.data[0].length;j++){
 				if(this.check(square.origin, i ,j)){
@@ -164,7 +165,7 @@ class Base{
 		}
 	}
 
-	clearLine(div){
+	clearLine(){
 		let self = this;
 		let arr = [];
 		for(let i=self.gameData.length-1;i>=0;i--){ 
@@ -180,54 +181,42 @@ class Base{
 			self.gameData.splice(arr[i],1);
 			self.gameData.unshift(new Array(self.gameData[0].length).fill(0));
 		}
-		if(arr.length>0){
-			let score = [10,30,60,100];
-			self.score += score[arr.length-1];
-			div.scoreDiv.innerHTML = self.score ; 
-		}
+		return arr;
+	}
+	addScore(arr,div){
+		let self = this;
+		let score = [10,30,60,100];
+		self.score += score[arr.length-1];
+		div.scoreDiv.innerHTML = self.score ; 
 	}
 
 	checkGameover(){
 		let self = this;
 		for(let j=self.gameData[1].length-1;j>=0;j--){
 			if(self.gameData[1][j] == 1){
-				clearInterval(self.timer);
-				self.timer = null;
 				return true;
 			}
-		}
+		} 
 		return false;
 	}
 
 	gameover(win,div){
 		if(win == "win"){
 			div.resultDiv.innerHTML = "你赢了";
+			div.re_resultDiv.innerHTML = "你输了";
 		}else{
 			div.resultDiv.innerHTML = "你输了";
+			div.re_resultDiv.innerHTML = "你赢了";
 		}
 	}
 
-	move(){ 
-	  	let self = this; 
-	  	if(!self.down()){
-	  		self.fixed();
-	  		if(!self.checkGameover()){
-		  		self.clearLine(arguments[0]);
-		  		self.produceNext();
-	  		}else{
-	  			self.gameover("lost",arguments[0]);
-	  		}
-	  	}
-	  	Base.refreshDiv(self.gameDivs,self.gameData);
-	  	Base.refreshDiv(self.nextDivs,self.next.data);
-    }
-
-    produceNext(){
+    produceNext(type,dir){
     	let self = this;
     	self.cur = self.next;
-		self.next = SquareFactory.prototype.make(Base.getRandom(0,7),Base.getRandom(0,4));
+		self.next = SquareFactory.prototype.make(type ,dir);
 		self.setData(self.cur,self.gameData);
-
+		Base.refreshDiv(self.gameDivs,self.gameData);
+		Base.refreshDiv(self.nextDivs,self.next.data);
     }
 
     //[min.max)
@@ -236,12 +225,12 @@ class Base{
     }
 
 
-	init(doms){
+	init(doms,type,dir){
 		let self = this; 
 		let gameContain = doms.gameDiv;
 		let nextContain = doms.nextDiv; 
-		self.next = SquareFactory.prototype.make(Base.getRandom(0,6),Base.getRandom(0,3));
-		self.produceNext();
+		self.next = SquareFactory.prototype.make(type,dir);
+		
 		Base.initDiv(gameContain,self.gameDivs,self.initGameData());
 		Base.initDiv(nextContain,self.nextDivs,self.next.data);
 		
@@ -249,7 +238,7 @@ class Base{
 		Base.refreshDiv(self.gameDivs,self.gameData);
 		Base.refreshDiv(self.nextDivs,self.next.data);
 
-		self.timer = setInterval(self.move.bind(self,doms),500); 
+		
 	}
 
 }

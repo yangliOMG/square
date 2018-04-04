@@ -22,7 +22,7 @@ const mix = function(...mixins){
 }
 
 class Remote extends mix(Base,Square){
-  constructor(){
+  constructor(socket){
     super();
     this.nextData=[];
     this.gameData=[];
@@ -30,56 +30,58 @@ class Remote extends mix(Base,Square){
     this.next = [];
     this.nextDivs = [];
     this.gameDivs = [];
-    this.timer ;
     this.score = 0;
+    this.socket = socket;
 
-    this.bindKeyEvent();
+    this.listenSocket();
   }
 
-  start(){
-  	let self = this;
-  	
-  	self.init(doms);
-  }
-
-  bindKeyEvent(){
+  listenSocket(){
     let self = this;
     let doms = {
       gameDiv :document.getElementById('remote_game'),
       nextDiv :document.getElementById('remote_next'),
       scoreDiv :document.getElementById('remote_score'),
-      resultDiv :document.getElementById('remote_gameOver')
+      resultDiv :document.getElementById('gameOver'),
+      re_resultDiv :document.getElementById('remote_gameOver')
     }
-    document.getElementById("remote_initGameData").onclick = function(){
-        self.initGameData();
-    }
-    document.getElementById("remote_initDiv").onclick = function(){ 
-        Base.initDiv(doms.gameDiv,self.gameDivs,self.gameData);
-    }
-    document.getElementById("remote_refreshDiv").onclick = function(){
-        Base.refreshDiv(self.gameDivs,self.gameData);
-    }
-    document.getElementById("remote_produceNext").onclick = function(){
-        self.produceNext();
-    }
-    document.getElementById("remote_rotate").onclick = function(){
-        self.rotate();
-    }
-    document.getElementById("remote_down").onclick = function(){
-        self.down();
-    }
-    document.getElementById("remote_right").onclick = function(){
-        self.right();
-    }
-    document.getElementById("remote_left").onclick = function(){
-        self.left();
-    }
-    document.getElementById("remote_fixed").onclick = function(){
-        self.fixed();
-    }
+    self.socket.on('init',function(data){
+      self.start(data.type,data.dir,doms);
+    });
+    self.socket.on('next',function(data){
+      self.produceNext(data.type,data.dir);
+    });
+    self.socket.on('rotate',function(data){
+      self.rotate();
+    });
+    self.socket.on('down',function(data){
+      self.down();
+    });
+    self.socket.on('right',function(data){
+      self.right();
+    });
+    self.socket.on('left',function(data){
+      self.left();
+    });
+     self.socket.on('fall',function(data){
+      self.fall();
+    });
+    self.socket.on('fixed',function(data){
+      self.fixed();
+    });
+    self.socket.on('line',function(data){
+      self.clearLine();self.addScore(data,doms)
+    });
+    self.socket.on('result',function(data){
+      self.gameover(data,doms);
+    });
+    
   }
-  
-  
+  start(type,dir,doms){
+  	let self = this;
+  	
+  	self.init(doms,type,dir);
+  }
 }
 
 export default Remote;

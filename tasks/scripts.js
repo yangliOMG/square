@@ -39,4 +39,7 @@ gulp.task('scripts',()=>{
     .pipe(uglify({compress:{properties:false},output:{'quote_keys':true}}))
     .pipe(gulp.dest('server/public/js'))
     .pipe(gulpif(args.watch,livereload()))
+
+    .pipe(gulp.src(['app/js/socket-io.js']))
+    .pipe(gulp.dest('server/public/js'))
 })
