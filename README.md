@@ -14,9 +14,11 @@
 * 打开tasks->scripts.js， 直接在 _gulp.src(['app/js/index.js'])_ 中添加socketio.js会导致其内容被解析转译导致报错（？），直接在index.js中import也会如此。
 * 在最后两行添加  _.pipe(gulp.src(['app/js/socket-io.js']))_   _.pipe(gulp.dest('server/public/js'))_ 可以避免被转译
 
+#### gulp启动项目
+* 在根目录 __gulp --watch__
 
 ### websocket使用小结：
-* 将wsServer.js放到server/routes/目录下，进入该目录，node wsServer.js  启动websocket服务，注意端口别被占用
+* 将wsServer.js放到server/routes/目录下，进入该目录，__node wsServer.js  启动websocket服务__ ，注意端口别被占用
 * socket.io支持自定义消息类型，使用起来很方便
 ```
 io.on('connection', function (socket) {
